@@ -1,1 +1,2 @@
-DELETE http://localhost:3001/api/persons/860
+//DELETE http://localhost:3001/api/persons/860
+DELETE https://tranquil-oasis-78105.herokuapp.com/api/persons/340
