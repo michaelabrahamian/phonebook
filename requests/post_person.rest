@@ -1,8 +1,8 @@
-//POST http://localhost:3001/api/persons
-POST https://tranquil-oasis-78105.herokuapp.com/api/persons
+POST http://localhost:3001/api/persons
+//POST https://tranquil-oasis-78105.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
-    "name": "Michael Abr",
+    "name": "Ter",
     "number": "041-232"
 }
