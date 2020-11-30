@@ -1,10 +1,11 @@
+// File for initialising the database
+
 const mongoose = require('mongoose')
 
+// Validate script use
 if (process.argv.length < 3) {
   console.log('Please provide the password as an argument: node mongo.js <password>')
   process.exit(1)
-} else if (process.argv.length == 3) {
-
 }
 
 const password = process.argv[2]
@@ -21,6 +22,7 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model('Person', personSchema)
 
+// Create the person as specified in script argument
 if (process.argv.length == 5) {
   const name = process.argv[3]
   const number = process.argv[4]
@@ -29,14 +31,14 @@ if (process.argv.length == 5) {
     name,
     number
   })
-  
+
   person.save().then(result => {
     console.log(`Added ${name} number ${number} to phonebook`)
     mongoose.connection.close()
   })
 
-} else if (process.argv.length == 3) {
-  
+} else if (process.argv.length === 3) {
+
   // Get all people
   Person.find({}).then(result => {
     console.log('phonebook:')
