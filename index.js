@@ -13,29 +13,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 app.use(cors())
 app.use(express.static('build'))
 
-let persons = [
-  {
-    "name": "Arto Hellas",
-    "number": "040-123456",
-    "id": 1
-  },
-  {
-    "name": "Ada Lovelace",
-    "number": "39-44-5323523",
-    "id": 2
-  },
-  {
-    "name": "Dan Abramov",
-    "number": "12-43-234345",
-    "id": 3
-  },
-  {
-    "name": "Mary Poppendieck",
-    "number": "39-23-6423122",
-    "id": 4
-  }
-]
-
+// Function to log all API requests for debugging
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path: ', request.path)
@@ -45,10 +23,13 @@ const requestLogger = (request, response, next) => {
 }
 app.use(requestLogger)
 
+// GET: /
 app.get('/', (req, res) => {
   res.send('<h1>Hi there</h1>')
 })
 
+// GET: /api/persons
+// Returns all rows in the persons table.
 app.get('/api/persons', (req, res) => {
   //res.json(persons)
   Person.find({}).then(persons => {
@@ -56,6 +37,8 @@ app.get('/api/persons', (req, res) => {
   })
 })
 
+// GET: /info
+// Returns the number of rows in the persons table, with the current date.
 app.get('/info', (req, res) => {
   Person.find({}).then(persons => {
     const body = 
@@ -67,6 +50,8 @@ app.get('/info', (req, res) => {
   })
 })
 
+// GET: /api/persons/{id}
+// Returns the person object for a specific ID
 app.get('/api/persons/:id', (req, res, next) => {
 
   Person.findById(req.params.id)
@@ -80,43 +65,54 @@ app.get('/api/persons/:id', (req, res, next) => {
     .catch(error => next(error))
 })
 
+// DELETE: /api/persons/{id}
+// Deletes the person with the specific ID
 app.delete('/api/persons/:id', (req, res, next) => {
+
+  // Find the person and delete them
   Person.findByIdAndRemove(req.params.id)
     .then(result => {
       res.status(204).end()
     })
     .catch(error => next(error))
 
-  const id = Number(req.params.id) 
-  persons = persons.filter(person => person.id !== id)
+  //const id = Number(req.params.id)
+  //persons = persons.filter(person => person.id !== id)
 
   res.status(204).end()
-  
 })
 
+// POST: /api/persons
+// Create a new person
 app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
   console.log(body)
+
+  // Validate that name and number are given
   if (body.name === '' || body.number === '') {
     return res.status(400).json({
       error: 'name and number are required'
     })
   }
 
+  // Create person object
   const person = new Person({
     name: body.name,
     number: body.number,
   })
 
+  // Store in DB
   person.save()
     .then(savedPerson => {
-      res.json(savedPerson)
+      res.json(savedPerson) // return stored person
     })
     .catch(error => next(error))
 
 })
 
+// PUT: /api/persons{id}
+// Replaces the person with the specific ID with a new person based on request
 app.put('/api/persons/:id', (req, res, next) => {
   const body = req.body
 
@@ -125,6 +121,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     number: body.number,
   }
 
+  // Find the specified person and update them
   Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true })
     .then(updatedPerson => {
       res.json(updatedPerson)
@@ -149,15 +146,12 @@ const errorHandler = (error, request, response, next) => {
     return response.status(401).send( { error: error.message })
   }
 
-  
+  // Pass error down the stack
   next(error)
 }
 
 app.use(errorHandler)
 
-const generateId = () => {
-  return Math.floor(Math.random()*1000)
-}
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
