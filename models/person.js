@@ -5,6 +5,7 @@ const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
 
+// Connect to MongoDB using URL in environment variable file
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
   .then(result => {
     console.log('connected to MongoDB')
@@ -13,6 +14,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useCrea
     console.log('error connecting to MongoDB:', error.message)
   })
 
+// Schema for person. Name and number are required.
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -30,6 +32,7 @@ const personSchema = new mongoose.Schema({
 // Ensure unique
 personSchema.plugin(uniqueValidator)
 
+// Modify the person schema to remove __v, and replace _id with id
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
